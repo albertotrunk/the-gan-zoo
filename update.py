@@ -15,7 +15,7 @@ def load_data():
 
     with open('gans.tsv') as fid:
         reader = csv.DictReader(fid, delimiter='\t')
-        gans = [row for row in reader]
+        gans = list(reader)
     return gans
 
 
@@ -53,8 +53,8 @@ def update_github_stats(gans):
     print('Fetching Github stats...')
     for i, gan in enumerate(gans):
         url = gan['Official_Code']
-        if url != "-" and url != "":
-            print(str(i) + '/' + str(num_rows))
+        if url not in ["-", ""]:
+            print(f'{str(i)}/{num_rows}')
             result = requests.get(url)
             c = result.text
             soup = BeautifulSoup(c, "html.parser")
@@ -63,9 +63,9 @@ def update_github_stats(gans):
             gan['Stars'] = samples[1].get_text().strip().replace(",", "")
             gan['Forks'] = samples[2].get_text().strip().replace(",", "")
 
-    print(str(i) + '/' + str(num_rows))
+    print(f'{str(i)}/{num_rows}')
     print('Complete.')
-    
+
     with open('gans.tsv', 'w') as outfile:
         fp = csv.DictWriter(outfile, gans[0].keys(), delimiter='\t')
         fp.writeheader()
